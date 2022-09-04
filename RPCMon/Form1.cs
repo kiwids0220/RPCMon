@@ -174,7 +174,8 @@ namespace RPCMon
             {
                 string jsonText = File.ReadAllText(m_RPCDBPath);
                 m_RPCDB = JsonConvert.DeserializeObject<Dictionary<string, Dictionary<string, dynamic>>>(jsonText);
-            } else
+            }
+            else
             {
                 m_RPCDB = new Dictionary<string, Dictionary<string, dynamic>>();
             }
@@ -188,22 +189,17 @@ namespace RPCMon
                 var parser = new MicrosoftWindowsRPCTraceEventParser(session.Source);
 
                 // Do we want to include more events? server events?
-
-                parser.RpcClientCallStart += e2 =>
+                parser.RpcClientCallStart += e3 =>
                 {
-                    // addEventToListView(e2);
-                    addEventToDataGridView(e2);
-                    
-                    /* 
-                      // Throws an error "Cross-thread operation not valid: Control 'textBox1' accessed from a thread other than the thread it was created on."
-                     string funcName = getFunctionName(e2.InterfaceUuid.ToString(), e2.ProcNum);
-                     ListViewItem item = new ListViewItem(e2.ProcessID.ToString());
-                     item.SubItems.Add(e2.ThreadID.ToString());
-                     item.SubItems.Add(e2.InterfaceUuid.ToString());
-                     item.SubItems.Add(funcName);
-                     listView1.Items.Add(item);*/
-                    // Console.WriteLine($"{e2.ID}                {funcName}");
+                    addEventToDataGridView2(e3);
                 };
+
+                parser.RpcServerCallStart += e2 =>
+                {
+                    addEventToDataGridView(e2);
+
+                };
+
                 session.Source.Process();
             }
         }
@@ -227,8 +223,8 @@ namespace RPCMon
         }
 
         // https://docs.microsoft.com/en-us/dotnet/desktop/winforms/controls/how-to-make-thread-safe-calls?view=netdesktop-6.0
-        private delegate void addEventToDataGridViewCallBack(Microsoft.Diagnostics.Tracing.Parsers.MicrosoftWindowsRPC.RpcClientCallStartArgs_V1TraceData i_Event);
-        private void addEventToDataGridView(Microsoft.Diagnostics.Tracing.Parsers.MicrosoftWindowsRPC.RpcClientCallStartArgs_V1TraceData i_Event)
+        private delegate void addEventToDataGridViewCallBack(Microsoft.Diagnostics.Tracing.Parsers.MicrosoftWindowsRPC.RpcServerCallStartArgs_V1TraceData i_Event);
+        private void addEventToDataGridView(Microsoft.Diagnostics.Tracing.Parsers.MicrosoftWindowsRPC.RpcServerCallStartArgs_V1TraceData i_Event)
         {
             if (this.InvokeRequired)
             {
@@ -244,7 +240,7 @@ namespace RPCMon
                 row.CreateCells(dataGridView1);
                 //dataGridView1.Rows.Add(cells);
                 //dataGridView1.Rows[0].Cells[0].Value = "";
-
+                row.Cells[(int)Utils.eColumnNames.taskCategory].Value = i_Event.TaskName.ToString();
                 row.Cells[(int)Utils.eColumnNames.PID].Value = i_Event.ProcessID.ToString();
                 row.Cells[(int)Utils.eColumnNames.TID].Value = i_Event.ThreadID.ToString();
                 setProcessName(i_Event, ref row);
@@ -272,6 +268,83 @@ namespace RPCMon
             }
         }
 
+        private delegate void addEventToDataGridViewCallBack2(Microsoft.Diagnostics.Tracing.Parsers.MicrosoftWindowsRPC.RpcClientCallStartArgs_V1TraceData i_Event);
+
+        private void addEventToDataGridView2(Microsoft.Diagnostics.Tracing.Parsers.MicrosoftWindowsRPC.RpcClientCallStartArgs_V1TraceData i_Event)
+        {
+            if (this.InvokeRequired)
+            {
+                addEventToDataGridViewCallBack2 s = new addEventToDataGridViewCallBack2(addEventToDataGridView2);
+                this.Invoke(s, i_Event);
+            }
+            else
+            {
+                string funcName = getFunctionName(i_Event.InterfaceUuid.ToString(), i_Event.ProcNum);
+
+                //DataGridViewRow row = (DataGridViewRow)dataGridView1.Rows[0].Clone();
+                DataGridViewRow row = new DataGridViewRow();
+                row.CreateCells(dataGridView1);
+                //dataGridView1.Rows.Add(cells);
+                //dataGridView1.Rows[0].Cells[0].Value = "";
+                row.Cells[(int)Utils.eColumnNames.taskCategory].Value = i_Event.TaskName.ToString();
+                row.Cells[(int)Utils.eColumnNames.PID].Value = i_Event.ProcessID.ToString();
+                row.Cells[(int)Utils.eColumnNames.TID].Value = i_Event.ThreadID.ToString();
+                setProcessName(i_Event, ref row);
+
+                row.Cells[(int)Utils.eColumnNames.UUID].Value = i_Event.InterfaceUuid.ToString();
+                if (i_Event.InterfaceUuid.ToString() != null && i_Event.InterfaceUuid.ToString() != "")
+                {
+                    setRpcFields(ref row, i_Event.InterfaceUuid.ToString());
+                }
+
+                row.Cells[(int)Utils.eColumnNames.Function].Value = funcName;
+
+                row.Cells[(int)Utils.eColumnNames.NetworkAddress].Value = i_Event.NetworkAddress.ToString();
+                row.Cells[(int)Utils.eColumnNames.Protocol].Value = i_Event.Protocol.ToString();
+                row.Cells[(int)Utils.eColumnNames.Endpoint].Value = i_Event.Endpoint.ToString();
+
+                row.Cells[(int)Utils.eColumnNames.Options].Value = i_Event.Options.ToString();
+                row.Cells[(int)Utils.eColumnNames.AuthenticationLevel].Value = i_Event.AuthenticationLevel.ToString();
+                row.Cells[(int)Utils.eColumnNames.AuthenticationService].Value = i_Event.AuthenticationService.ToString();
+                row.Cells[(int)Utils.eColumnNames.ImpersonationLevel].Value = i_Event.ImpersonationLevel.ToString();
+                row.DefaultCellStyle.Font = new Font(dataGridView1.DefaultCellStyle.Font, FontStyle.Regular);
+                dataGridView1.Rows.Add(row);
+                this.m_TotalNumberOfEvents += 1;
+                this.toolStripStatusLabelTotalEvents.Text = "Total events: " + this.m_TotalNumberOfEvents;
+            }
+        }
+        private void setProcessName(Microsoft.Diagnostics.Tracing.Parsers.MicrosoftWindowsRPC.RpcServerCallStartArgs_V1TraceData i_Event, ref DataGridViewRow row)
+        {
+            if (i_Event.ProcessName == "")
+            {
+                if (m_ProcessPIDsDictionary.ContainsKey(i_Event.ProcessID))
+                {
+                    row.Cells[(int)Utils.eColumnNames.ProcessName].Value = m_ProcessPIDsDictionary[i_Event.ProcessID];
+                }
+                else
+                {
+                    try
+                    {
+                        using (var p = Process.GetProcessById(i_Event.ProcessID))
+                        {
+                            row.Cells[(int)Utils.eColumnNames.ProcessName].Value = p.ProcessName;
+                            m_ProcessPIDsDictionary.Add(p.Id, p.ProcessName);
+                        }
+                    }
+                    catch
+                    {
+                        row.Cells[(int)Utils.eColumnNames.ProcessName].Value = "N\\A";
+                        m_ProcessPIDsDictionary.Add(i_Event.ProcessID, "N\\A");
+                    }
+
+                }
+
+            }
+            else
+            {
+                row.Cells[(int)Utils.eColumnNames.ProcessName].Value = i_Event.ProcessName;
+            }
+        }
         private void setProcessName(Microsoft.Diagnostics.Tracing.Parsers.MicrosoftWindowsRPC.RpcClientCallStartArgs_V1TraceData i_Event, ref DataGridViewRow row)
         {
             if (i_Event.ProcessName == "")
@@ -304,7 +377,6 @@ namespace RPCMon
                 row.Cells[(int)Utils.eColumnNames.ProcessName].Value = i_Event.ProcessName;
             }
         }
-
         private void toolStripButtonStart_Click(object sender, EventArgs e)
         {
             if (!m_IsCaptureButtonPressed)
@@ -443,7 +515,7 @@ namespace RPCMon
                 step = -1;
             }
 
-            if (dataGridView1.SelectedRows != null &&  dataGridView1.SelectedRows.Count > 0)
+            if (dataGridView1.SelectedRows != null && dataGridView1.SelectedRows.Count > 0)
             {
                 DataGridViewRow selectedRow = dataGridView1.SelectedRows[0];
                 startIndex = selectedRow.Index;
@@ -456,7 +528,7 @@ namespace RPCMon
             }
 
             startIndex += 1;
-            for (int i = startIndex; i < dataGridView1.Rows.Count; i+= step)
+            for (int i = startIndex; i < dataGridView1.Rows.Count; i += step)
             {
 
                 if (step + i < 0)
@@ -601,7 +673,7 @@ namespace RPCMon
                                 if (cellValueFromGridViewCell.Value.ToString() == valueFromFilter)
                                 {
                                     filterRowBasedOnForm(i_FormName, row.Index, rule.SubItems[(int)Utils.eFilterNames.Action].Text);
-                                   // this.dataGridView1.Rows[row.Index].Visible = (rule.SubItems[(int)Utils.eFilterNames.Action].Text == "Include");
+                                    // this.dataGridView1.Rows[row.Index].Visible = (rule.SubItems[(int)Utils.eFilterNames.Action].Text == "Include");
                                 }
                                 else
                                 {
@@ -648,7 +720,8 @@ namespace RPCMon
             if (i_FormName == Utils.eFormNames.FormColumnFilter)
             {
                 m_LastListViewColumnFilter = i_ListView;
-            } else
+            }
+            else
             {
                 m_LastListViewHighlighFilter = i_ListView;
             }
@@ -733,14 +806,15 @@ namespace RPCMon
             {
                 openColumnFilterWindow();
                 result = true;
-            } else if (keyData == (Keys.Control | Keys.B))
+            }
+            else if (keyData == (Keys.Control | Keys.B))
             {
                 Font boldFont = new Font(dataGridView1.DefaultCellStyle.Font, FontStyle.Bold);
                 Font font = new Font(dataGridView1.DefaultCellStyle.Font, FontStyle.Regular);
 
                 foreach (DataGridViewCell cell in dataGridView1.SelectedCells)
                 {
-                    
+
                     if (!dataGridView1.Rows[cell.RowIndex].DefaultCellStyle.Font.Bold)
                     {
                         font = boldFont;
@@ -761,11 +835,13 @@ namespace RPCMon
 
                 }
                 result = true;
-            } else if (keyData == (Keys.Control | Keys.F))
+            }
+            else if (keyData == (Keys.Control | Keys.F))
             {
                 openFindWindow();
                 result = true;
-            } else if (keyData == (Keys.Control | Keys.H))
+            }
+            else if (keyData == (Keys.Control | Keys.H))
             {
                 openHighlightWindows();
                 result = true;
@@ -774,7 +850,8 @@ namespace RPCMon
             {
                 // We need to implement the options for the search
                 FindWindow_searchForMatch(m_LastSearchValue, true, false, false);
-            } else if (keyData == (Keys.Shift | Keys.F3))
+            }
+            else if (keyData == (Keys.Shift | Keys.F3))
             {
                 // We need to implement the options for the search
                 FindWindow_searchForMatch(m_LastSearchValue, false, false, false);
@@ -785,7 +862,8 @@ namespace RPCMon
 
         private void dataGridView1_ColumnHeaderMouseClick(object sender, DataGridViewCellMouseEventArgs e)
         {
-            if (e.Button == System.Windows.Forms.MouseButtons.Right) {
+            if (e.Button == System.Windows.Forms.MouseButtons.Right)
+            {
                 openColumnSelectionWindow();
             }
         }
@@ -830,7 +908,7 @@ namespace RPCMon
                     copiedCell = dataGridView1.Rows[m_CurrentRowIndexRightClick].Cells[m_CurrentColumnIndexRightClick].Value.ToString();
                 }
             }
-            
+
             if (copiedCell != "")
             {
                 System.Windows.Forms.Clipboard.SetText(copiedCell);
@@ -1024,9 +1102,19 @@ namespace RPCMon
             checkIdDBGHelpExist();
         }
 
+        private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+
+        }
+
+        private void dataGridView1_CellContentClick_1(object sender, DataGridViewCellEventArgs e)
+        {
+
+        }
+
         private void updateToolStripStatusLabelDBPath(string i_DBPath)
-       {
+        {
             this.toolStripStatusLabelDBPath.Text = "DB File: " + Path.GetFileName(this.m_RPCDBPath);
-       }
+        }
     }
 }

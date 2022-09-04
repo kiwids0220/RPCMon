@@ -13,7 +13,8 @@ namespace RPCMon
 
         public enum eColumnNames
         {
-            PID = 0,
+            taskCategory =0,
+            PID,
             TID,
             ProcessName,
             UUID,
@@ -45,6 +46,7 @@ namespace RPCMon
 
         public static readonly Dictionary<string, int> m_ColumnMapToIndex = new Dictionary<string, int>()
         {
+                { eColumnNames.taskCategory.ToString(), (int)eColumnNames.PID },
                 { eColumnNames.PID.ToString(), (int)eColumnNames.PID },
                 { eColumnNames.TID.ToString(), (int)eColumnNames.TID },
                 { eColumnNames.ProcessName.ToString(), (int)eColumnNames.ProcessName },

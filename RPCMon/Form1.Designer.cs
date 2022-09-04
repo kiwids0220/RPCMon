@@ -49,6 +49,14 @@
             this.toolStripButtonGrid = new System.Windows.Forms.ToolStripButton();
             this.toolStripButtonRemoveDuplicate = new System.Windows.Forms.ToolStripButton();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
+            this.statusStrip1 = new System.Windows.Forms.StatusStrip();
+            this.toolStripStatusLabelTotalEvents = new System.Windows.Forms.ToolStripStatusLabel();
+            this.toolStripStatusLabelDBPath = new System.Windows.Forms.ToolStripStatusLabel();
+            this.toolTipDBPath = new System.Windows.Forms.ToolTip(this.components);
+            this.contextMenuStripRightClickGridView = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.copyRowToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.copyCellToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.taskCategory = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.ColumnPID = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.ColumnTID = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.ColumnProcessName = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -65,13 +73,6 @@
             this.ColumnAuthenticationLevel = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.ColumnAuthenticationService = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.ColumnImpersonationLevel = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.statusStrip1 = new System.Windows.Forms.StatusStrip();
-            this.toolStripStatusLabelTotalEvents = new System.Windows.Forms.ToolStripStatusLabel();
-            this.toolStripStatusLabelDBPath = new System.Windows.Forms.ToolStripStatusLabel();
-            this.toolTipDBPath = new System.Windows.Forms.ToolTip(this.components);
-            this.contextMenuStripRightClickGridView = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.copyRowToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.copyCellToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.toolStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
@@ -259,6 +260,7 @@
             this.dataGridView1.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
             this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dataGridView1.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.taskCategory,
             this.ColumnPID,
             this.ColumnTID,
             this.ColumnProcessName,
@@ -280,8 +282,63 @@
             this.dataGridView1.ReadOnly = true;
             this.dataGridView1.Size = new System.Drawing.Size(828, 486);
             this.dataGridView1.TabIndex = 3;
+            this.dataGridView1.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellContentClick_1);
             this.dataGridView1.CellMouseClick += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.dataGridView1_CellMouseClick);
             this.dataGridView1.ColumnHeaderMouseClick += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.dataGridView1_ColumnHeaderMouseClick);
+            // 
+            // statusStrip1
+            // 
+            this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.toolStripStatusLabelTotalEvents,
+            this.toolStripStatusLabelDBPath});
+            this.statusStrip1.Location = new System.Drawing.Point(0, 538);
+            this.statusStrip1.Name = "statusStrip1";
+            this.statusStrip1.Size = new System.Drawing.Size(828, 24);
+            this.statusStrip1.TabIndex = 4;
+            this.statusStrip1.Text = "statusStrip1";
+            // 
+            // toolStripStatusLabelTotalEvents
+            // 
+            this.toolStripStatusLabelTotalEvents.BorderSides = System.Windows.Forms.ToolStripStatusLabelBorderSides.Right;
+            this.toolStripStatusLabelTotalEvents.Name = "toolStripStatusLabelTotalEvents";
+            this.toolStripStatusLabelTotalEvents.Size = new System.Drawing.Size(85, 19);
+            this.toolStripStatusLabelTotalEvents.Text = "Total events: 0";
+            // 
+            // toolStripStatusLabelDBPath
+            // 
+            this.toolStripStatusLabelDBPath.Name = "toolStripStatusLabelDBPath";
+            this.toolStripStatusLabelDBPath.Size = new System.Drawing.Size(49, 19);
+            this.toolStripStatusLabelDBPath.Text = "DB File: ";
+            this.toolStripStatusLabelDBPath.MouseLeave += new System.EventHandler(this.toolStripStatusLabelDBPath_MouseLeave);
+            this.toolStripStatusLabelDBPath.MouseHover += new System.EventHandler(this.toolStripStatusLabelDBPath_MouseHover);
+            // 
+            // contextMenuStripRightClickGridView
+            // 
+            this.contextMenuStripRightClickGridView.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.copyRowToolStripMenuItem,
+            this.copyCellToolStripMenuItem});
+            this.contextMenuStripRightClickGridView.Name = "contextMenuStripRightClickGridView";
+            this.contextMenuStripRightClickGridView.Size = new System.Drawing.Size(129, 48);
+            // 
+            // copyRowToolStripMenuItem
+            // 
+            this.copyRowToolStripMenuItem.Name = "copyRowToolStripMenuItem";
+            this.copyRowToolStripMenuItem.Size = new System.Drawing.Size(128, 22);
+            this.copyRowToolStripMenuItem.Text = "Copy Row";
+            this.copyRowToolStripMenuItem.Click += new System.EventHandler(this.copyRowToolStripMenuItem_Click);
+            // 
+            // copyCellToolStripMenuItem
+            // 
+            this.copyCellToolStripMenuItem.Name = "copyCellToolStripMenuItem";
+            this.copyCellToolStripMenuItem.Size = new System.Drawing.Size(128, 22);
+            this.copyCellToolStripMenuItem.Text = "Copy Cell";
+            this.copyCellToolStripMenuItem.Click += new System.EventHandler(this.copyCellToolStripMenuItem_Click);
+            // 
+            // taskCategory
+            // 
+            this.taskCategory.HeaderText = "Task Category";
+            this.taskCategory.Name = "taskCategory";
+            this.taskCategory.ReadOnly = true;
             // 
             // ColumnPID
             // 
@@ -385,54 +442,6 @@
             this.ColumnImpersonationLevel.Name = "ColumnImpersonationLevel";
             this.ColumnImpersonationLevel.ReadOnly = true;
             // 
-            // statusStrip1
-            // 
-            this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.toolStripStatusLabelTotalEvents,
-            this.toolStripStatusLabelDBPath});
-            this.statusStrip1.Location = new System.Drawing.Point(0, 538);
-            this.statusStrip1.Name = "statusStrip1";
-            this.statusStrip1.Size = new System.Drawing.Size(828, 24);
-            this.statusStrip1.TabIndex = 4;
-            this.statusStrip1.Text = "statusStrip1";
-            // 
-            // toolStripStatusLabelTotalEvents
-            // 
-            this.toolStripStatusLabelTotalEvents.BorderSides = System.Windows.Forms.ToolStripStatusLabelBorderSides.Right;
-            this.toolStripStatusLabelTotalEvents.Name = "toolStripStatusLabelTotalEvents";
-            this.toolStripStatusLabelTotalEvents.Size = new System.Drawing.Size(85, 19);
-            this.toolStripStatusLabelTotalEvents.Text = "Total events: 0";
-            // 
-            // toolStripStatusLabelDBPath
-            // 
-            this.toolStripStatusLabelDBPath.Name = "toolStripStatusLabelDBPath";
-            this.toolStripStatusLabelDBPath.Size = new System.Drawing.Size(49, 19);
-            this.toolStripStatusLabelDBPath.Text = "DB File: ";
-            this.toolStripStatusLabelDBPath.MouseLeave += new System.EventHandler(this.toolStripStatusLabelDBPath_MouseLeave);
-            this.toolStripStatusLabelDBPath.MouseHover += new System.EventHandler(this.toolStripStatusLabelDBPath_MouseHover);
-            // 
-            // contextMenuStripRightClickGridView
-            // 
-            this.contextMenuStripRightClickGridView.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.copyRowToolStripMenuItem,
-            this.copyCellToolStripMenuItem});
-            this.contextMenuStripRightClickGridView.Name = "contextMenuStripRightClickGridView";
-            this.contextMenuStripRightClickGridView.Size = new System.Drawing.Size(129, 48);
-            // 
-            // copyRowToolStripMenuItem
-            // 
-            this.copyRowToolStripMenuItem.Name = "copyRowToolStripMenuItem";
-            this.copyRowToolStripMenuItem.Size = new System.Drawing.Size(128, 22);
-            this.copyRowToolStripMenuItem.Text = "Copy Row";
-            this.copyRowToolStripMenuItem.Click += new System.EventHandler(this.copyRowToolStripMenuItem_Click);
-            // 
-            // copyCellToolStripMenuItem
-            // 
-            this.copyCellToolStripMenuItem.Name = "copyCellToolStripMenuItem";
-            this.copyCellToolStripMenuItem.Size = new System.Drawing.Size(128, 22);
-            this.copyCellToolStripMenuItem.Text = "Copy Cell";
-            this.copyCellToolStripMenuItem.Click += new System.EventHandler(this.copyCellToolStripMenuItem_Click);
-            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -486,6 +495,9 @@
         private System.Windows.Forms.ToolStripMenuItem buildDBToolStripMenuItem;
         private System.Windows.Forms.ToolStripButton toolStripButtonGrid;
         private System.Windows.Forms.ToolStripButton toolStripButtonRemoveDuplicate;
+        private System.Windows.Forms.ToolStripMenuItem optionsToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem setDbgHelpFilePathToolStripMenuItem;
+        private System.Windows.Forms.DataGridViewTextBoxColumn taskCategory;
         private System.Windows.Forms.DataGridViewTextBoxColumn ColumnPID;
         private System.Windows.Forms.DataGridViewTextBoxColumn ColumnTID;
         private System.Windows.Forms.DataGridViewTextBoxColumn ColumnProcessName;
@@ -502,8 +514,6 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn ColumnAuthenticationLevel;
         private System.Windows.Forms.DataGridViewTextBoxColumn ColumnAuthenticationService;
         private System.Windows.Forms.DataGridViewTextBoxColumn ColumnImpersonationLevel;
-        private System.Windows.Forms.ToolStripMenuItem optionsToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem setDbgHelpFilePathToolStripMenuItem;
     }
 }
 
