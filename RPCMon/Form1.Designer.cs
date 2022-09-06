@@ -66,6 +66,7 @@
             this.ColumnProceduresCount = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.ColumnService = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.ColumnFunction = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.ProcNum = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.ColumnNetworkAddress = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.ColumnProtocol = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.ColumnEndpoint = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -270,6 +271,7 @@
             this.ColumnProceduresCount,
             this.ColumnService,
             this.ColumnFunction,
+            this.ProcNum,
             this.ColumnNetworkAddress,
             this.ColumnProtocol,
             this.ColumnEndpoint,
@@ -396,6 +398,12 @@
             this.ColumnFunction.Name = "ColumnFunction";
             this.ColumnFunction.ReadOnly = true;
             // 
+            // ProcNum
+            // 
+            this.ProcNum.HeaderText = "ProcNum";
+            this.ProcNum.Name = "ProcNum";
+            this.ProcNum.ReadOnly = true;
+            // 
             // ColumnNetworkAddress
             // 
             this.ColumnNetworkAddress.HeaderText = "NetworkAddress";
@@ -507,6 +515,7 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn ColumnProceduresCount;
         private System.Windows.Forms.DataGridViewTextBoxColumn ColumnService;
         private System.Windows.Forms.DataGridViewTextBoxColumn ColumnFunction;
+        private System.Windows.Forms.DataGridViewTextBoxColumn ProcNum;
         private System.Windows.Forms.DataGridViewTextBoxColumn ColumnNetworkAddress;
         private System.Windows.Forms.DataGridViewTextBoxColumn ColumnProtocol;
         private System.Windows.Forms.DataGridViewTextBoxColumn ColumnEndpoint;

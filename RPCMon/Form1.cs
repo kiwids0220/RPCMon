@@ -252,6 +252,7 @@ namespace RPCMon
                 }
 
                 row.Cells[(int)Utils.eColumnNames.Function].Value = funcName;
+                row.Cells[(int)Utils.eColumnNames.ProcNum].Value = i_Event.ProcNum.ToString();
 
                 row.Cells[(int)Utils.eColumnNames.NetworkAddress].Value = i_Event.NetworkAddress.ToString();
                 row.Cells[(int)Utils.eColumnNames.Protocol].Value = i_Event.Protocol.ToString();
@@ -298,7 +299,7 @@ namespace RPCMon
                 }
 
                 row.Cells[(int)Utils.eColumnNames.Function].Value = funcName;
-
+                row.Cells[(int)Utils.eColumnNames.ProcNum].Value = i_Event.ProcNum.ToString(); 
                 row.Cells[(int)Utils.eColumnNames.NetworkAddress].Value = i_Event.NetworkAddress.ToString();
                 row.Cells[(int)Utils.eColumnNames.Protocol].Value = i_Event.Protocol.ToString();
                 row.Cells[(int)Utils.eColumnNames.Endpoint].Value = i_Event.Endpoint.ToString();
